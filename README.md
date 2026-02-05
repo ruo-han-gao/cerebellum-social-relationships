@@ -1,6 +1,6 @@
 # Cerebellum & social relationships
 
-This project examined how quality of social relationships affects cerebellar morphology and cerebellar-cerebral covariance in development and aging.
+This project examined how quality of social relationships associates with cerebellar morphology and cerebellar-cerebral covariance in development and aging.
 
 ## Steps for preprocessing and analyses
 
