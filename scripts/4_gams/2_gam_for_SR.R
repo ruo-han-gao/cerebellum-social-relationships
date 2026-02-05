@@ -35,7 +35,7 @@ setwd(codedir)
 
 
 # To run this script, first run `gam_functions.R` for necessary functions
-source("2_gam_functions.R")
+source("1_gam_functions.R")
 
 # =============================================
 #            Read in data                  ####

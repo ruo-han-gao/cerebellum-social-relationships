@@ -122,41 +122,7 @@ The `cortest.bartlett()` performs Bartlett's test of sphericity to assess the fa
 
 ----------
 
-## 5  Number of factors to retain
-
-To determine the appropriate number of factors to retain, several criteria were evaluated, including eigenvalues greater than 1, parallel analysis, the minimum average partial (MAP) test, and the Bayesian Information Criterion (BIC). Based on the convergence of results across these methods and considering the factor interpretability, EFA models with factor number of 4 and 5 were test.
-
-### Eingenvalues
-From the scree plot, **4 factors** has an eingenvalue of over 1.
-
-```{r vss scree}
-ev = eigen(poly_R)$values
-plot(ev, type = "b", main = "Scree Plot", xlab = "Factor Number", ylab = "Eigenvalue")
-abline(h=1, col="red", lty=2)
-```
-
-### Parallel analysis
- suggests that the number of factors to retain = 5.
-
-```{r parallel analysis}
-fa.parallel(poly_R, n.obs = nrow(dat), fm = "pa")
-```
-
-### MAP and BIC
-
-I tried multiple rotation methods and estimation methods. The results are very similar, with `fm = "pa"` and ``fm = "minres"`showing slightly lower BIC than `fm = "gls"` and `fm = "wls"`. Rotation methods did not affect the results that much. I randomly kept one in this documentation.
-
-```{r MAP, ig.show='hide', fig.keep='none'}
-nfactors(x = poly_R, n = 5, rotate = "oblimin", fm = "pa", n.obs = nrow(dat))
-```
-
-----------
-
-## 6  Exploratory factor analysis (EFA)
-
-The above methods indicated that the appropriate number of factors to retain should be 4 or 5. Accordingly, Factor models were constructed to test models with either 4 or 5 factors. Both models demonstrated clear and interpretable structures. The 5-factor model aligned well with the theoretical structure of the 5 scales, and the 4-factor model combined items from the Rejection and Loneliness scales into a single factor, suggesting an overlap in their underlying constructs.
-
-To evaluate the internal consistency of the resulting factors, Cronbach’s alpha was computed for each factor structure. All 6 structures (including the combined factor in the 4-factor model) demonstrated Acceptable to Excellent reliability.
+## 5  Exploratory factor analysis (EFA)
 
 ```{r efa model fit indices}
 fa.stats <- function(efa.model) {
@@ -176,7 +142,7 @@ fa.stats <- function(efa.model) {
 }
 ```
 
-### 6.1  EFA models
+### 5.1  EFA models
 
 #### EFA with 4 factors
 
@@ -229,7 +195,7 @@ print(efa.summary)
 ```
 
 
-### 6.2  Cronbach’s alpha for factor reliability
+### 5.2  Cronbach’s alpha for factor reliability
 
 Factor internal consistency was evaluated using Cronbach’s alpha, one of the most common measures of internal consistency reliability (how well a set of items measures a single underlying construct).
 
@@ -264,7 +230,7 @@ alpha_summary$Reliability <- cut(
 print(alpha_summary)
 ```
 
-### 6.3 One-factor EFA results
+### 5.3 One-factor EFA results
 
 We explored the factor structure of the social health variables using exploratory factor analysis (EFA). A four- or five-factor solution emerged, with moderately correlated factors, suggesting the presence of a potential general construct. 
 
@@ -303,7 +269,7 @@ ggsave(file.path(plot_dir, paste0("hcp", "_sr_factor_loadings.png")),
 ```
 
 
-### 6.4 Export EFA sr score
+### 5.4 Export EFA sr score
 
 ```{r get 1fa efa score}
 efa.1fa.scores = factor.scores(soc_item22, efa.1fa, method = "regression")
@@ -342,203 +308,10 @@ output_file <- file.path(datadir, paste0("hcp_cerebel_cerebr_social_sr_n", nrow(
 write.csv(cerebel_cerebr_social_sr, output_file, row.names = FALSE)
 ```
 
-----------
 
-## 7  Confirmatory factor analysis (CFA)
+## 6 Group difference of social relationship score
 
-CFAs were conducted to evaluate the factor structures identified in the EFA, using the `WLSMV` estimator. In the 5-factor model, the 22 items were specified to load onto 5 latent constructs consistent with the original scales: Emotional Support, Friendship, Loneliness, Perceived Rejection, and Perceived Hostility. 
-
-```{r include=FALSE}
-# ==== This text is for your reference only; it won't appear in the output ====
-# In the 4-factor model, items from the Loneliness and Perceived Rejection scales were combined to form a single latent construct labeled Isolation, while the remaining items loaded onto 3 factors as in the 5-factor model.
-```
-
-- `estimator = "WLSMV"`: WLSMV stands for Weighted Least Squares Means and Variance adjusted estimator. It’s used in structural equation modeling (SEM) and CFA especially when dealing with ordinal data like Likert scales.
-
-Example output: χ²/df = 3.05; RMSEA = 0.068, 90% CI [0.061, 0.075]; CFI = 0.983; TLI = 0.979; SRMR = .071, as well as satisfactory construct reliability and convergent validity for each factor, with composite reliability (CR) values ranging from 0.723 to 0.886, and average variance extracted (AVE) values ranged from 0.534 to 0.714. The 4-factor CFA model also exhibited satisfactory CRs (0.720-0.902) and AVEs (0.534-0.666), but its overall model performance was inferior compared to that of the 5-factor CFA model.
-
-Overall, the five-factor CFA model demonstrated good fit to the data. The results provided adequate support for the proposed factor structure, with acceptable model fit indices and strong factor loadings, supporting the construct validity of the measurement model.
-
-```{r cfa fit indices}
-cfa.fit.stats <- function(model, round_digits = 3, print = TRUE) {
-
-  stats <- lavaan::fitMeasures(model, c(
-    "chisq", "df", "pvalue",
-    "cfi", "tli", "rmsea", "rmsea.ci.lower", "rmsea.ci.upper", 
-    "srmr"
-  ))
-
-  stats <- round(stats, round_digits)
-  return(stats)
-}
-```
-
-### 7.1  CFA models
-
-#### Measure of factor reliability
-
-- `r2`: indicate the proportion of variance in each observed indicator that is explained by its latent factor.
-- `compRelSEM`: calculate composite Reliability (CR), which is a measure of internal consistency reliability for a latent construct, similar to Cronbach’s alpha. 
-  - Values above 0.70 are generally considered acceptable for reliability.
-- `AVE()`: Average Variance Extracted, which is a measure of convergent validity and tells how much variance in the observed variables (indicators) is explained by the latent construct (factor), on average.
-  - AVE ≥ 0.50: Acceptable
-
-
-#### CFA with 5 factors
-
-```{R cfa 5fas, message = FALSE}
-cfa.5fas.model <- '
-  Loneliness =~ lon260 + lon261 + lon253 + lon254
-  Hostility  =~ hos268 + hos267 + hos263 + hos262 + hos270
-  EmoSupt    =~ emo200 + emo203 + emo205 + emo222 + emo216
-  Friends    =~ fri230 + fri233 + fri237 + fri239 + fri247
-  Rejection  =~ rej276 + rej279 + rej281
-'
-
-cfa.5fas <- cfa(cfa.5fas.model, data = soc_item22, estimator = "WLSMV", ordered = colnames(soc_item22))
-cfa.fit.stats(cfa.5fas)
-
-loadings = inspect(cfa.5fas, "std")$lambda
-ifelse(abs(loadings) >= 0.1, round(loadings, 3), NA)
-```
-
-```{r cfa 5 fas R2}
-inspect(cfa.5fas, "r2")
-range(inspect(cfa.5fas, "r2"))
-mean(inspect(cfa.5fas, "r2"))
-```
-
-```{r cfa 5fas reliability}
-# factor reliability
-compRelSEM(cfa.5fas)
-AVE(cfa.5fas)
-```
-
-```{r cfa 5 fas plot loadings, warning=FALSE}
-loadings_df = as.data.frame(loadings)
-loadings_long <- loadings_df %>%
-  rownames_to_column("Item") %>%
-  pivot_longer(-Item, names_to = "Factor", values_to = "Loading") %>%
-  # remove NA or zero loadings
-  filter(!is.na(Loading) & Loading != 0) %>%
-  arrange(Factor, Loading)
-
-# Make Item a factor in the desired plotting order
-loadings_long$Item <- factor(loadings_long$Item, levels = loadings_long$Item)
-
-desired_order <- c("Rejection", "Loneliness", "Hostility", "Friends", "EmoSupt")
-loadings_long$Factor <- factor(loadings_long$Factor, levels = desired_order)
-
-my_colors <- c("olivedrab", "skyblue3", "khaki3","peachpuff3","tan3")
-
-# Plot
-ggplot(loadings_long, aes(x = Item, y = Loading, fill = Factor)) +
-  geom_col(width = 0.6) +
-  coord_flip() +
-  scale_fill_manual(values = my_colors,
-                    labels = c("Rejection", "Loneliness","Hostility", "Friendship", "Emotional support")) +
-  theme_minimal(base_size = 12) +
-  labs(title = "CFA loadings",
-       x = "Item",
-       y = "",
-       fill = "Factors") +
-  theme(
-    axis.text.y = element_text(size = 9, family = "Arial"),
-    legend.text = element_text(size = 9, family = "Arial"),
-    legend.title = element_text(size = 10, family = "Arial"),
-    panel.grid = element_blank()
-  ) + 
-  guides(fill = guide_legend(keywidth = 0.7, keyheight = 0.7))
-
-ggsave(file.path(plot_dir, paste0("hcp_cfa_5factor_loadings.png")),
-       width = 4, height = 5, dpi = 300)
-
-```
-
-```{r cfa 5fas factor cor}
-inspect(cfa.5fas, "cor.lv")
-```
-
-#### CFA with 4 factors
-
-```{R cfa 4fas, message = FALSE}
-cfa.4fas.model <- '
-  Isolation  =~ lon260 + lon261 + lon253 + lon254 + rej276 + rej279 + rej281
-  Hostility  =~ hos268 + hos267 + hos263 + hos262 + hos270
-  EmoSupt    =~ emo200 + emo203 + emo205 + emo222 + emo216
-  Friends    =~ fri230 + fri233 + fri237 + fri239 + fri247
-'
-
-cfa.4fas <- cfa(cfa.4fas.model, data = soc_item22, estimator = "WLSMV", ordered = colnames(soc_item22))
-cfa.fit.stats(cfa.4fas)
-loadings = inspect(cfa.4fas, "std")$lambda
-ifelse(abs(loadings) >= 0.1, round(loadings, 3), NA)
-```
-
-```{r cfa 4 fas R2}
-inspect(cfa.4fas, "r2")
-range(inspect(cfa.4fas, "r2"))
-mean(inspect(cfa.4fas, "r2"))
-```
-
-```{r cfa 4fas reliability}
-# factor reliability
-compRelSEM(cfa.4fas)
-AVE(cfa.4fas) # Average Variance Extracted
-```
-
-```{r cfa 4fas factor cor}
-inspect(cfa.4fas, "cor.lv")
-```
-
-### 7.2 CFA model summary
-
-```{r cfa summary}
-cfa.model.list <- list(
-  cfa.5fas = cfa.fit.stats(cfa.5fas),
-  cfa.4fas = cfa.fit.stats(cfa.4fas))
-
-cfa.summary <- do.call(rbind, cfa.model.list)
-print(cfa.summary)
-```
-
-| Fit Index     | Description                                            | Acceptable Thresholds                                          |
-|-------------------|----------------------------------------------------|----------------------------------------------------------------|
-| χ² (Chi-square)   | Tests exact model fit; sensitive to sample size    | Non-significant preferred (p > .05); often ignored in large N  |
-| χ²/df (Normed Chi-square) | Chi-square divided by degrees of freedom   | < 3 (good), < 5 (acceptable)                                   |
-| CFI           | Comparative Fit Index; compares model to null model    | ≥ 0.95 (good), ≥ 0.90 (acceptable)                             |
-| TLI           | Tucker-Lewis Index; penalizes for model complexity     | ≥ 0.95 (good), ≥ 0.90 (acceptable)                             |
-| RMSEA         | Root Mean Square Error of Approximation                | ≤ 0.06 (good), ≤ 0.08 (acceptable); 90% CI should include 0.05 |
-| SRMR          | Standardized Root Mean Square Residual                 | ≤ 0.08 (good), ≤ 0.10 (acceptable)                             |
-| AVE           | Average Variance Extracted, measuring convergent validity  | ≥ 0.50 (acceptable), < 0.5 (problematic)                   |
-
-
-### 7.3 Export CFA scores
-
-```{r plot cfa 5 factors}
-cfa.scores <- lavPredict(cfa.5fas)
-cfa.scores = as.data.frame(cfa.scores)
-scored_long <- cfa.scores %>%
-  pivot_longer(cols = everything(), names_to = "Factor", values_to = "Score")
-
-ggplot(scored_long, aes(x = Score)) +
-  geom_histogram(bins = 30, fill = "skyblue", color = "black") +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "darkgray") +
-  facet_wrap(~ Factor, scales = "free") +
-  theme_minimal() +
-  labs(title = "Distributions of CFA Scores - 5 factors", x = "Score", y = "Count")
-```
-
-```{r combine cfa scores, warning=FALSE}
-cerebel_cerebr_social_facors = bind_cols(cerebel_cerebr_social_sr, cfa.scores)
-
-output_file <- file.path(datadir, paste0("hcp_cerebel_cerebr_social_factors_n", nrow(dat), ".csv"))
-write.csv(cerebel_cerebr_social_facors, output_file, row.names = FALSE)
-```
-
-----------
-
-## Group difference of social relationship score
+### 6.1 Comparison between HCP-D and HCP-A
 
 - no significance between the HCA and HCD groups.
 
@@ -604,6 +377,9 @@ hcpa_data %>%
     sd   = sd(sr, na.rm = TRUE)
   )
 ```
+
+
+### 6.2 Comparison between females and males in each dataset
 
 ```{r equal variance between cohorts}
 var.test(sr ~ sex, data = hcpd_data)
