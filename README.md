@@ -20,7 +20,7 @@ Expected runtime: ~5 minutes per subject.
 In `script/2_prep/`:
 
 - `1_qc_bad_euler.R` performs QC based on the Euler index of cerebral cortex surface reconstructions.
-- `2_hcp_data_prep.R` combines all available high-quality brain imaging data with social relationship measures into a single analysis-ready data frame.
+- `2_hcp_data_prep.R` combines all available quality brain imaging data with social relationship measures into a single analysis-ready data frame.
 
 ### 3. Factor analysis
 
@@ -40,5 +40,4 @@ In `scripts/4_gams/`:
 In `scripts/5_covariance/`:
 
 - `1_covar_analysis.R` checks assumptions and runs linear regression.
-- `2_covar_visualization.R` visulises covariance effects via heatmaps and line graphs.
-
+- `2_covar_visualization.R` viisualizes covariance effects using heatmaps and line plots.
