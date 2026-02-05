@@ -40,4 +40,4 @@ In `scripts/4_gams/`:
 In `scripts/5_covariance/`:
 
 - `1_covar_analysis.R` checks assumptions and runs linear regression.
-- `2_covar_visualization.R` viisualizes covariance effects using heatmaps and line plots.
+- `2_covar_visualization.R` visualizes covariance effects using heatmaps and line plots.
