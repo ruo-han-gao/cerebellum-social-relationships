@@ -357,7 +357,7 @@ age_sex <- friends %>%
   select(-interview_age)
 
 # =============================================
-#        Discard subjectsin hcpA           ####
+#        Discard subjects in hcpA           ####
 # =============================================
 
 if (source_dir == hcpa_dir) {
