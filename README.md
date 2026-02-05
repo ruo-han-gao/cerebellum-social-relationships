@@ -32,8 +32,8 @@ In `script/3_factor_analysis/`:
 
 In `scripts/4_gams/`:
 
-- `1_gam_functions.R`: Defines helper functions for generalized additive model (GAM) fitting and result extraction.
-- `2_gam_for_SR.R`: Sources `1_gam_functions.R` and fits hierarchical GAMs to evaluate the contribution of each independent variable, assess concurvity, and extract partial R and derivatives.
+- `1_gam_functions.R` defines helper functions for generalized additive model (GAM) fitting and result extraction.
+- `2_gam_for_SR.R` sources `1_gam_functions.R` and fits hierarchical GAMs to evaluate the contribution of each independent variable, assess concurvity, and extract partial R and derivatives.
 
 ### 5. Analysis of cerebello-cerebral covariance
 
